@@ -3,6 +3,7 @@ import Image from "next/image";
 import Sidebar from "../components/Sidebar";
 import Feed from "../components/Feed";
 import Widgets from "../components/Widgets";
+import CommentModal from "../components/CommentModal";
 // import styles from '../styles/Home.module.css'
 
 export default function Home({ newsResults }) {
@@ -24,6 +25,8 @@ export default function Home({ newsResults }) {
         {/* Widgets */}
         <Widgets />
         {/* Modal */}
+
+        <CommentModal />
       </main>
     </div>
   );
