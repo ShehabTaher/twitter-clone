@@ -5,7 +5,7 @@ import Feed from "../components/Feed";
 import Widgets from "../components/Widgets";
 // import styles from '../styles/Home.module.css'
 
-export default function Home() {
+export default function Home({ newsResults }) {
   return (
     <div>
       <Head>
@@ -14,7 +14,7 @@ export default function Home() {
         {/* <link rel="icon" href="/public/Logo_of_Twitter.svg" /> */}
       </Head>
 
-      <main className="flex min-h-screen max-w-7xl mx-auto ">
+      <main className="flex min-h-screen mx-auto ">
         {/* Sidebar */}
         <Sidebar />
         {/* Feed */}
@@ -28,3 +28,5 @@ export default function Home() {
     </div>
   );
 }
+
+// https://saurav.tech/NewsAPI/top-headlines/category/bussiness/in.json
