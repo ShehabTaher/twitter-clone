@@ -28,5 +28,3 @@ export default function Home({ newsResults }) {
     </div>
   );
 }
-
-// https://saurav.tech/NewsAPI/top-headlines/category/bussiness/in.json
