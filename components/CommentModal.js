@@ -7,10 +7,17 @@ import {
   XIcon,
 } from "@heroicons/react/outline";
 import { useEffect, useState } from "react";
-import { doc, onSnapshot } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  onSnapshot,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db } from "../firebase";
 import Moment from "react-moment";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 const CommentModal = () => {
   const [open, setOpen] = useRecoilState(modalState);
@@ -18,6 +25,7 @@ const CommentModal = () => {
   const [post, setPost] = useState();
   const [input, setInput] = useState("");
   const { data: session } = useSession();
+  const router = useRouter();
 
   useEffect(() => {
     onSnapshot(doc(db, "posts", postId), (snapshot) => {
@@ -25,7 +33,18 @@ const CommentModal = () => {
     });
   }, [postId, db]);
 
-  function sendComment() {}
+  async function sendComment() {
+    await addDoc(collection(db, "posts", postId, "comments"), {
+      Comment: input,
+      name: session.user.name,
+      username: session.user.username,
+      userImg: session.user.image,
+      timestamp: serverTimestamp(),
+    });
+    setOpen(false);
+    setInput("");
+    router.push(`posts/${postId}`);
+  }
 
   return (
     <div>
@@ -63,7 +82,7 @@ const CommentModal = () => {
               </span>
             </div>
             <p className="text-gray-500 text-[15px] sm:text-[16px] ml-16 mb-2">
-              {post?.data().text}
+              {post?.data()?.text}
             </p>
             {/* Reply Section */}
             <div className="flex p-3 space-x-3">
