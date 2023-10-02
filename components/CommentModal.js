@@ -35,7 +35,7 @@ const CommentModal = () => {
 
   async function sendComment() {
     await addDoc(collection(db, "posts", postId, "comments"), {
-      Comment: input,
+      comment: input,
       name: session.user.name,
       username: session.user.username,
       userImg: session.user.image,

@@ -6,18 +6,38 @@ import Head from "next/head";
 import { ArrowLeftIcon } from "@heroicons/react/outline";
 import Post from "../../components/Post";
 import { useEffect, useState } from "react";
-import { doc, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+} from "firebase/firestore";
 import { db } from "../../firebase";
+import Comment from "../../components/Comment";
 
 export default function PostPage() {
   const router = useRouter();
   const { id } = router.query;
   const [post, setPost] = useState(null);
-
+  const [comments, setComments] = useState([]);
+  console.log(comments);
+  // Get the post
   useEffect(
     () => onSnapshot(doc(db, "posts", id), (snapshot) => setPost(snapshot)),
     [db, id]
   );
+
+  // Get Comments of the post
+  useEffect(() => {
+    onSnapshot(
+      query(
+        collection(db, "posts", id, "comments"),
+        orderBy("timestamp", "desc")
+      ),
+      (snapshot) => setComments(snapshot.docs)
+    );
+  }, [db, id]);
 
   return (
     <div>
@@ -41,17 +61,18 @@ export default function PostPage() {
             </h2>
           </div>
           <Post id={id} post={post} />
-          {/* {posts.map((post) => (
-            <div
-              key={post.id}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1 }}
-            >
-              <Post key={post.id} post={post} />
+
+          {comments.length > 0 && (
+            <div className="">
+              {comments.map((comment) => (
+                <Comment
+                  key={comment.id}
+                  id={comment.id}
+                  comment={comment.data()}
+                />
+              ))}
             </div>
-          ))} */}
+          )}
         </div>
 
         {/* Widgets */}
