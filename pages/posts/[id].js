@@ -6,6 +6,7 @@ import Head from "next/head";
 import { ArrowLeftIcon } from "@heroicons/react/outline";
 import Post from "../../components/Post";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import {
   collection,
   doc,
@@ -15,6 +16,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import Comment from "../../components/Comment";
+import { AnimatePresence } from "framer-motion";
 
 export default function PostPage() {
   const router = useRouter();
@@ -64,14 +66,24 @@ export default function PostPage() {
 
           {comments.length > 0 && (
             <div className="">
-              {comments.map((comment) => (
-                <Comment
-                  key={comment.id}
-                  commentId={comment.id}
-                  originalPostId={id}
-                  comment={comment.data()}
-                />
-              ))}
+              <AnimatePresence>
+                {comments.map((comment) => (
+                  <motion.div
+                    key={comment.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1 }}
+                  >
+                    <Comment
+                      key={comment.id}
+                      commentId={comment.id}
+                      originalPostId={id}
+                      comment={comment.data()}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
           )}
         </div>
