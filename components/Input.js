@@ -14,10 +14,14 @@ import { useSession, signOut } from "next-auth/react";
 import { useRef, useState } from "react";
 import { db, storage } from "../firebase";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
+import { useRecoilState } from "recoil";
+import { userState } from "../atom/userAtom";
+import { getAuth } from "firebase/auth";
 
 const Input = () => {
-  const { data: session } = useSession();
+  const auth = getAuth();
   const [input, setInput] = useState("");
+  const [currentUser, setCurrentUser] = useRecoilState(userState);
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const filePickerRef = useRef(null);
@@ -27,12 +31,12 @@ const Input = () => {
     setLoading(true);
 
     const docRef = await addDoc(collection(db, "posts"), {
-      id: session.user.uid,
+      id: currentUser.uid,
       text: input,
-      userImg: session.user.image,
+      userImg: currentUser.userImg,
       timestamp: serverTimestamp(),
-      name: session.user.name,
-      username: session.user.username,
+      name: currentUser.name,
+      username: currentUser.username,
     });
     const imageRef = ref(storage, `posts/${docRef.id}/image`);
 
@@ -59,14 +63,18 @@ const Input = () => {
       setSelectedFile(readerEvent.target.result);
     };
   };
-  console.log(session);
+  function onSignOut() {
+    signOut(auth);
+    setCurrentUser(null);
+  }
+
   return (
     <>
-      {session && (
+      {currentUser && (
         <div className="flex border-b border-gray-200 p-3 space-x-3">
           <img
-            onClick={signOut}
-            src={session?.user.image}
+            onClick={onSignOut}
+            src={currentUser?.userImg}
             alt="user-profile"
             className="h-11 w-11 rounded-full cursor-pointer hover:brightness-95"
           />

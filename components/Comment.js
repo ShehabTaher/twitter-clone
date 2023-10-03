@@ -21,9 +21,11 @@ import {
   onSnapshot,
   setDoc,
 } from "firebase/firestore";
+import { userState } from "../atom/userAtom";
 
 const Comment = ({ comment, commentId, originalPostId }) => {
-  const { data: session } = useSession();
+  // const { data: session } = useSession();
+  const [currentUser] = useRecoilState(userState);
   const [likes, setLikes] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
   const [open, setOpen] = useRecoilState(modalState);
@@ -40,14 +42,12 @@ const Comment = ({ comment, commentId, originalPostId }) => {
 
   // Comment has like or not
   useEffect(() => {
-    setHasLiked(
-      likes.findIndex((like) => like.id === session?.user.uid) !== -1
-    );
+    setHasLiked(likes.findIndex((like) => like.id === currentUser?.uid) !== -1);
   }, [likes]);
 
   // Like Comment
   async function likeComment() {
-    if (session) {
+    if (currentUser) {
       if (hasLiked) {
         await deleteDoc(
           doc(
@@ -57,7 +57,7 @@ const Comment = ({ comment, commentId, originalPostId }) => {
             "comments",
             commentId,
             "likes",
-            session?.user.uid
+            currentUser?.uid
           )
         );
       } else {
@@ -69,15 +69,16 @@ const Comment = ({ comment, commentId, originalPostId }) => {
             "comments",
             commentId,
             "likes",
-            session.user.uid
+            currentUser?.uid
           ),
           {
-            username: session.user.username,
+            username: currentUser?.username,
           }
         );
       }
     } else {
-      signIn();
+      // signIn();
+      router.push("/auth/signin");
     }
   }
 
@@ -127,8 +128,9 @@ const Comment = ({ comment, commentId, originalPostId }) => {
           <div className=" flex items-center select-none ">
             <ChatIcon
               onClick={() => {
-                if (!session) {
-                  signIn();
+                if (!currentUser) {
+                  // signIn();
+                  router.push("/auth/signin");
                 } else {
                   setPostId(originalPostId);
                   setOpen(!open);
@@ -137,7 +139,7 @@ const Comment = ({ comment, commentId, originalPostId }) => {
               className="h-9 w-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100"
             />
           </div>
-          {session?.user.uid === comment?.userId && (
+          {currentUser?.uid === comment?.userId && (
             <TrashIcon
               onClick={deleteComment}
               className="h-9 w-9 hoverEffect p-2 hover:text-red-500 hover:bg-red-100"

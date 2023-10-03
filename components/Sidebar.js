@@ -1,8 +1,7 @@
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ImgLogo from "../public/Logo_of_Twitter.svg";
 import SidebarMenuItem from "./SidebarMenuItem";
-
 import {
   BellIcon,
   BookmarkIcon,
@@ -13,10 +12,37 @@ import {
   InboxIcon,
   UserIcon,
 } from "@heroicons/react/outline";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { db } from "../firebase";
+import { useRecoilState } from "recoil";
+import { userState } from "../atom/userAtom";
+import { doc, getDoc } from "firebase/firestore";
+import { useRouter } from "next/router";
 
 const Sidebar = () => {
-  const { data: session } = useSession();
+  const [currentUser, setCurrentUser] = useRecoilState(userState);
+  const router = useRouter();
+  const auth = getAuth();
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const fetchUser = async () => {
+          const docRef = doc(db, "users", auth.currentUser.providerData[0].uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setCurrentUser(docSnap.data());
+          }
+        };
+        fetchUser();
+      }
+    });
+  }, []);
+
+  function onSignOut() {
+    signOut(auth);
+    setCurrentUser(null);
+  }
+
   return (
     <div className="hidden sm:flex flex-col p-2 xl:items-start fixed h-full xl:ml-24">
       {/* Twitter Logo */}
@@ -29,7 +55,7 @@ const Sidebar = () => {
       <div className="mt-4 mb-2.5 xl:items-start">
         <SidebarMenuItem text="Home" Icon={HomeIcon} active />
         <SidebarMenuItem text="Explore" Icon={HashtagIcon} />
-        {session && (
+        {currentUser && (
           <>
             <SidebarMenuItem text="Notification" Icon={BellIcon} />
             <SidebarMenuItem text="Message" Icon={InboxIcon} />
@@ -42,28 +68,28 @@ const Sidebar = () => {
       </div>
 
       {/* Button */}
-      {session ? (
+      {currentUser ? (
         <>
           <button className="bg-blue-400 text-white rounded-full w-56 h-12 font-bold shadow-md hover:brightness-95 text-lg hidden xl:inline">
             Tweet
           </button>
           <div className="hoverEffect text-gray-700 flex  items-center justify-center xl:justify-start mt-auto">
             <img
-              onClick={signOut}
-              src={session?.user.image}
+              onClick={onSignOut}
+              src={currentUser?.userImg}
               alt="Profile Pic"
               className="h-10 w-10 rounded-full xl:mr-2"
             />
             <div className="leading-5 hidden xl:inline">
-              <h4 className="font-bold">{session.user.name}</h4>
-              <p className="text-gray-500">@{session.user.username}</p>
+              <h4 className="font-bold">{currentUser?.name}</h4>
+              <p className="text-gray-500">@{currentUser?.username}</p>
             </div>
             <DotsCircleHorizontalIcon className="h-5 xl:ml-8 hidden xl:inline" />
           </div>
         </>
       ) : (
         <button
-          onClick={signIn}
+          onClick={() => router.push("/auth/signin")}
           className="bg-blue-400 text-white rounded-full w-56 h-12 font-bold shadow-md hover:brightness-95 text-lg hidden xl:inline"
         >
           Sign In

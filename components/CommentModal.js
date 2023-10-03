@@ -18,13 +18,15 @@ import { db } from "../firebase";
 import Moment from "react-moment";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import { userState } from "../atom/userAtom";
 
 const CommentModal = () => {
   const [open, setOpen] = useRecoilState(modalState);
   const [postId] = useRecoilState(postIdState);
+  const [currentUser] = useRecoilState(userState);
   const [post, setPost] = useState();
   const [input, setInput] = useState("");
-  const { data: session } = useSession();
+  // const { data: session } = useSession();
   const router = useRouter();
 
   useEffect(() => {
@@ -36,11 +38,11 @@ const CommentModal = () => {
   async function sendComment() {
     await addDoc(collection(db, "posts", postId, "comments"), {
       comment: input,
-      name: session.user.name,
-      username: session.user.username,
-      userImg: session.user.image,
+      name: currentUser.name,
+      username: currentUser.username,
+      userImg: currentUser.userImg,
       timestamp: serverTimestamp(),
-      userId: session.user.uid,
+      userId: currentUser.uid,
     });
     setOpen(false);
     setInput("");
@@ -88,7 +90,7 @@ const CommentModal = () => {
             {/* Reply Section */}
             <div className="flex p-3 space-x-3">
               <img
-                src={session?.user.image}
+                src={currentUser?.userImg}
                 alt="user-profile"
                 className="h-11 w-11 rounded-full cursor-pointer hover:brightness-95"
               />
