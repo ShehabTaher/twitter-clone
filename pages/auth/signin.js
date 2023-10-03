@@ -30,22 +30,29 @@ const Signin = () => {
 
   return (
     <div className="flex justify-center mt-20 space-x-4">
-      <div className="flex flex-col items-center">
-        <img
-          className="w-36 object-cover"
-          src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Logo_of_Twitter.svg/2491px-Logo_of_Twitter.svg.png"
-          alt="twitter-logo"
-          width="300"
-        />
-        <p className="text-center text-sm italic my-10">
-          This app is created by learning purposes
-        </p>
-        <button
-          onClick={onGoogleClick}
-          className="bg-red-400 rounded-lg p-3 text-white hover:bg-red-500"
+      <div className="">
+        {/* {Object.values(providers).map((provider) => ( */}
+        <div
+          // key={provider.name}
+          className="flex flex-col items-center"
         >
-          Sign in with Google
-        </button>
+          <img
+            className="w-36 object-cover"
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Logo_of_Twitter.svg/2491px-Logo_of_Twitter.svg.png"
+            alt="twitter-logo"
+            width="300"
+          />
+          <p className="text-center text-sm italic my-10">
+            This app is created by learning purposes
+          </p>
+          <button
+            onClick={onGoogleClick}
+            className="bg-red-400 rounded-lg p-3 text-white hover:bg-red-500"
+          >
+            Sign in with Google
+          </button>
+        </div>
+        {/* ))} */}
       </div>
     </div>
   );
