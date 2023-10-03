@@ -70,7 +70,7 @@ const Widgets = () => {
       </div>
 
       <div className="text-gray-700 space-y-3 bg-gray-100 rounded-xl pt-2 w-[90%] xl:w-[70%]">
-        <h4 className="font-bold text-xl px-4">What's happening</h4>
+        <h4 className="font-bold text-xl px-4">What&apos;s happening</h4>
         <AnimatePresence>
           {articles?.articles.slice(0, articleNum).map((article) => (
             <motion.div
